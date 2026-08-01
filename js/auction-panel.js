@@ -1,261 +1,226 @@
 // Auction Control Panel JavaScript
 // Saudi License Plate Auction System
 
-class AuctionTimer {
-    constructor(auctionControls = null) {
-        this.totalSeconds = 0;
-        this.intervalId = null;
-        this.isRunning = false;
-        this.isPaused = false;
-        this.auctionControls = auctionControls;
-        this.startTime = null;
-        
-        this.minutesDisplay = document.getElementById('minutes');
-        this.secondsDisplay = document.getElementById('seconds');
-        this.timerDisplay = document.getElementById('timerDisplay');
-        this.durationInput = document.getElementById('timerDuration');
-        
-        this.startBtn = document.getElementById('startTimer');
-        this.pauseBtn = document.getElementById('pauseTimer');
-        this.resumeBtn = document.getElementById('resumeTimer');
-        this.resetBtn = document.getElementById('resetTimer');
-        
-        this.loadTimerState();
-        this.bindEvents();
-    }
-    
-    bindEvents() {
-        this.startBtn.addEventListener('click', () => this.start());
-        this.pauseBtn.addEventListener('click', () => this.pause());
-        this.resumeBtn.addEventListener('click', () => this.resume());
-        this.resetBtn.addEventListener('click', () => this.reset());
-    }
-    
-    start() {
-        if (this.isRunning) return;
-        
-        const minutes = parseInt(this.durationInput.value) || 5;
-        this.totalSeconds = minutes * 60;
-        this.isRunning = true;
-        this.isPaused = false;
-        this.startTime = Date.now();
-        
-        this.updateDisplay();
-        this.saveTimerState();
-        
-        this.startBtn.disabled = true;
-        this.pauseBtn.disabled = false;
-        this.resumeBtn.disabled = true;
-        this.durationInput.disabled = true;
-        
-        this.intervalId = setInterval(() => this.tick(), 1000);
-    }
-    
-    tick() {
-        if (this.totalSeconds > 0) {
-            this.totalSeconds--;
-            this.updateDisplay();
-            this.saveTimerState();
-            
-            // Alert when less than 30 seconds
-            if (this.totalSeconds <= 30 && this.totalSeconds > 0) {
-                this.timerDisplay.classList.add('alert');
-            }
-        } else {
-            this.timeUp();
-        }
-    }
-    
-    pause() {
-        if (!this.isRunning || this.isPaused) return;
-        
-        this.isPaused = true;
-        clearInterval(this.intervalId);
-        this.saveTimerState();
-        
-        this.pauseBtn.disabled = true;
-        this.resumeBtn.disabled = false;
-    }
-    
-    resume() {
-        if (!this.isRunning || !this.isPaused) return;
-        
-        this.isPaused = false;
-        this.intervalId = setInterval(() => this.tick(), 1000);
-        this.saveTimerState();
-        
-        this.pauseBtn.disabled = false;
-        this.resumeBtn.disabled = true;
-    }
-    
-    reset() {
-        this.isRunning = false;
-        this.isPaused = false;
-        this.startTime = null;
-        clearInterval(this.intervalId);
-        
-        this.totalSeconds = 0;
-        this.updateDisplay();
-        this.clearTimerState();
-        
-        this.timerDisplay.classList.remove('alert');
-        this.startBtn.disabled = false;
-        this.pauseBtn.disabled = true;
-        this.resumeBtn.disabled = true;
-        this.durationInput.disabled = false;
-    }
-    
-    timeUp() {
-        this.playNotificationSound();
-        this.timerDisplay.classList.add('alert');
-        
-        // Automatically end the auction
-        if (this.auctionControls) {
-            this.auctionControls.endAuction();
-        } else {
-            this.reset();
-        }
-    }
-    
-    updateDisplay() {
-        const minutes = Math.floor(this.totalSeconds / 60);
-        const seconds = this.totalSeconds % 60;
-        
-        this.minutesDisplay.textContent = minutes.toString().padStart(2, '0');
-        this.secondsDisplay.textContent = seconds.toString().padStart(2, '0');
-    }
-    
-    saveTimerState() {
-        const state = {
-            totalSeconds: this.totalSeconds,
-            isRunning: this.isRunning,
-            isPaused: this.isPaused,
-            startTime: this.startTime,
-            duration: this.durationInput.value
-        };
-        localStorage.setItem('auctionTimerState', JSON.stringify(state));
-    }
-    
-    loadTimerState() {
-        const savedState = localStorage.getItem('auctionTimerState');
-        if (savedState) {
-            try {
-                const state = JSON.parse(savedState);
-                
-                // Check if the timer was running and calculate elapsed time
-                if (state.isRunning && !state.isPaused && state.startTime) {
-                    const elapsedSeconds = Math.floor((Date.now() - state.startTime) / 1000);
-                    this.totalSeconds = Math.max(0, state.totalSeconds - elapsedSeconds);
-                    
-                    if (this.totalSeconds > 0) {
-                        this.isRunning = true;
-                        this.isPaused = false;
-                        this.startTime = state.startTime;
-                        this.durationInput.value = state.duration;
-                        
-                        this.updateDisplay();
-                        this.startBtn.disabled = true;
-                        this.pauseBtn.disabled = false;
-                        this.resumeBtn.disabled = true;
-                        this.durationInput.disabled = true;
-                        
-                        // Resume the countdown
-                        this.intervalId = setInterval(() => this.tick(), 1000);
-                    } else {
-                        // Timer expired while page was closed
-                        this.totalSeconds = 0;
-                        this.updateDisplay();
-                        this.clearTimerState();
-                    }
-                } else if (state.isPaused) {
-                    // Timer was paused, restore paused state
-                    this.totalSeconds = state.totalSeconds;
-                    this.isRunning = true;
-                    this.isPaused = true;
-                    this.durationInput.value = state.duration;
-                    
-                    this.updateDisplay();
-                    this.startBtn.disabled = true;
-                    this.pauseBtn.disabled = true;
-                    this.resumeBtn.disabled = false;
-                    this.durationInput.disabled = true;
-                }
-            } catch (e) {
-                console.log('Error loading timer state:', e);
-                this.clearTimerState();
-            }
-        }
-    }
-    
-    clearTimerState() {
-        localStorage.removeItem('auctionTimerState');
-    }
-    
-    playNotificationSound() {
-        try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            oscillator.frequency.value = 800;
-            oscillator.type = 'sine';
-            
-            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.5);
-        } catch (e) {
-            console.log('Audio not supported');
-        }
-    }
-}
-
-class PlateOverlay {
+class PlateManager {
     constructor() {
+        this.selectedPlate = 1;
+        this.plateData = {};
+        this.autoConversionEnabled = false;
+        
+        // English to Arabic letter mapping for Saudi license plates
+        this.englishToArabicMap = {
+            'A': 'ش',
+            'B': 'لا',
+            'C': 'چ',
+            'D': 'د',
+            'E': 'د',
+            'F': 'ف',
+            'G': 'غ',
+            'H': 'ه',
+            'I': 'ي',
+            'J': 'ت',
+            'K': 'ن',
+            'L': 'م',
+            'M': 'ة',
+            'N': 'ى',
+            'O': 'خ',
+            'P': 'ح',
+            'Q': 'ق',
+            'R': 'ق',
+            'S': 'س',
+            'T': 'ف',
+            'U': 'ع',
+            'V': 'ر',
+            'W': 'ص',
+            'X': 'ء',
+            'Y': 'غ',
+            'Z': 'ز'
+        };
+        
+        // Initialize plate data
+        for (let i = 1; i <= 5; i++) {
+            this.plateData[i] = {
+                arabicLetters: 'أ ب ج',
+                englishLetters: 'A B J',
+                arabicNumbers: '۱۱۱۱',
+                englishNumbers: '-1111'
+            };
+        }
+        
         this.arabicLettersInput = document.getElementById('arabicLetters');
         this.englishLettersInput = document.getElementById('englishLetters');
         this.arabicNumbersInput = document.getElementById('arabicNumbers');
         this.englishNumbersInput = document.getElementById('englishNumbers');
+        this.selectedPlateLabel = document.getElementById('selectedPlateLabel');
+        this.autoConversionToggle = document.getElementById('autoConversionToggle');
         
         this.bindEvents();
+        this.updateForm();
     }
     
     bindEvents() {
-        this.arabicLettersInput.addEventListener('input', () => this.updateOverlay());
-        this.englishLettersInput.addEventListener('input', () => this.updateOverlay());
-        this.arabicNumbersInput.addEventListener('input', () => this.updateOverlay());
-        this.englishNumbersInput.addEventListener('input', () => this.updateOverlay());
+        // Form input listeners
+        this.arabicLettersInput.addEventListener('input', () => this.handleArabicLettersInput());
+        this.englishLettersInput.addEventListener('input', () => this.handleEnglishLettersInput());
+        this.arabicNumbersInput.addEventListener('input', () => this.updatePlateData());
+        this.englishNumbersInput.addEventListener('input', () => this.updatePlateData());
+        
+        // Auto conversion toggle listener
+        this.autoConversionToggle.addEventListener('change', () => {
+            this.autoConversionEnabled = this.autoConversionToggle.checked;
+        });
+        
+        // Plate click listeners
+        document.querySelectorAll('.plate-item').forEach(plate => {
+            plate.addEventListener('click', (e) => {
+                const plateNumber = parseInt(plate.dataset.plate);
+                this.selectPlate(plateNumber);
+            });
+        });
     }
     
-    updateOverlay() {
-        // Update SVG text elements for single plate
-        const arabicLettersOverlay = document.getElementById('overlayArabicLetters');
-        const englishLettersOverlay = document.getElementById('overlayEnglishLetters');
-        const arabicNumbersOverlay = document.getElementById('overlayArabicNumbers');
-        const englishNumbersOverlay = document.getElementById('overlayEnglishNumbers');
+    handleArabicLettersInput() {
+        if (this.autoConversionEnabled) {
+            this.convertEnglishToArabic();
+        }
+        this.updatePlateData();
+    }
+    
+    handleEnglishLettersInput() {
+        if (this.autoConversionEnabled) {
+            this.convertEnglishToArabic();
+        }
+        this.updatePlateData();
+    }
+    
+    convertEnglishToArabic() {
+        const englishText = this.englishLettersInput.value.toUpperCase();
+        let arabicText = '';
         
-        if (arabicLettersOverlay) {
-            arabicLettersOverlay.textContent = this.arabicLettersInput.value || 'أ ب ج';
+        for (let char of englishText) {
+            if (this.englishToArabicMap[char]) {
+                arabicText += this.englishToArabicMap[char];
+            } else if (char === ' ') {
+                arabicText += ' ';
+            }
+            // Ignore characters that don't have mappings
         }
-        if (englishLettersOverlay) {
-            englishLettersOverlay.textContent = this.englishLettersInput.value || 'A B J';
+        
+        this.arabicLettersInput.value = arabicText;
+    }
+    
+    selectPlate(plateNumber) {
+        // Save current form data before switching
+        this.saveCurrentData();
+        
+        // Update selected plate
+        this.selectedPlate = plateNumber;
+        
+        // Update visual selection
+        document.querySelectorAll('.plate-item').forEach(plate => {
+            plate.classList.remove('selected');
+        });
+        
+        const selectedPlateElement = document.querySelector(`.plate-item[data-plate="${plateNumber}"]`);
+        if (selectedPlateElement) {
+            selectedPlateElement.classList.add('selected');
         }
-        if (arabicNumbersOverlay) {
-            arabicNumbersOverlay.textContent = this.arabicNumbersInput.value || '۱۱۱۱';
+        
+        // Update form with new plate data
+        this.updateForm();
+        
+        // Update main plate display
+        this.updateMainPlateDisplay();
+    }
+    
+    updateForm() {
+        const data = this.plateData[this.selectedPlate];
+        
+        this.arabicLettersInput.value = data.arabicLetters;
+        this.englishLettersInput.value = data.englishLetters;
+        this.arabicNumbersInput.value = data.arabicNumbers;
+        this.englishNumbersInput.value = data.englishNumbers;
+        
+        this.selectedPlateLabel.textContent = `اللوحة النشطة: ${this.selectedPlate}`;
+    }
+    
+    updatePlateData() {
+        this.plateData[this.selectedPlate] = {
+            arabicLetters: this.arabicLettersInput.value,
+            englishLetters: this.englishLettersInput.value,
+            arabicNumbers: this.arabicNumbersInput.value,
+            englishNumbers: this.englishNumbersInput.value
+        };
+        
+        // Update all plate overlays
+        this.updateAllOverlays();
+    }
+    
+    saveCurrentData() {
+        this.plateData[this.selectedPlate] = {
+            arabicLetters: this.arabicLettersInput.value,
+            englishLetters: this.englishLettersInput.value,
+            arabicNumbers: this.arabicNumbersInput.value,
+            englishNumbers: this.englishNumbersInput.value
+        };
+    }
+    
+    updateAllOverlays() {
+        for (let i = 1; i <= 5; i++) {
+            const data = this.plateData[i];
+            
+            const arabicLettersOverlay = document.getElementById(`overlayArabicLetters${i}`);
+            const englishLettersOverlay = document.getElementById(`overlayEnglishLetters${i}`);
+            const arabicNumbersOverlay = document.getElementById(`overlayArabicNumbers${i}`);
+            const englishNumbersOverlay = document.getElementById(`overlayEnglishNumbers${i}`);
+            
+            if (arabicLettersOverlay) {
+                arabicLettersOverlay.textContent = data.arabicLetters || 'أ ب ج';
+            }
+            if (englishLettersOverlay) {
+                englishLettersOverlay.textContent = data.englishLetters || 'A B J';
+            }
+            if (arabicNumbersOverlay) {
+                arabicNumbersOverlay.textContent = data.arabicNumbers || '۱۱۱۱';
+            }
+            if (englishNumbersOverlay) {
+                englishNumbersOverlay.textContent = data.englishNumbers || '-1111';
+            }
         }
-        if (englishNumbersOverlay) {
-            englishNumbersOverlay.textContent = this.englishNumbersInput.value || '-1111';
+    }
+    
+    updateMainPlateDisplay() {
+        // Update main plate (always shows selected plate)
+        const data = this.plateData[this.selectedPlate];
+        
+        const mainArabicLetters = document.getElementById('overlayArabicLetters1');
+        const mainEnglishLetters = document.getElementById('overlayEnglishLetters1');
+        const mainArabicNumbers = document.getElementById('overlayArabicNumbers1');
+        const mainEnglishNumbers = document.getElementById('overlayEnglishNumbers1');
+        
+        if (mainArabicLetters) {
+            mainArabicLetters.textContent = data.arabicLetters || 'أ ب ج';
+        }
+        if (mainEnglishLetters) {
+            mainEnglishLetters.textContent = data.englishLetters || 'A B J';
+        }
+        if (mainArabicNumbers) {
+            mainArabicNumbers.textContent = data.arabicNumbers || '۱۱۱۱';
+        }
+        if (mainEnglishNumbers) {
+            mainEnglishNumbers.textContent = data.englishNumbers || '-1111';
+        }
+        
+        // Update main plate label
+        const mainPlateLabel = document.querySelector('.main-plate .plate-number');
+        if (mainPlateLabel) {
+            mainPlateLabel.textContent = `اللوحة النشطة - ${this.selectedPlate}`;
         }
     }
 }
 
 class AuctionControls {
-    constructor(timer) {
-        this.timer = timer;
+    constructor() {
         this.status = 'idle';
         
         this.startAuctionBtn = document.getElementById('startAuction');
@@ -263,18 +228,8 @@ class AuctionControls {
         this.resumeAuctionBtn = document.getElementById('resumeAuction');
         this.endAuctionBtn = document.getElementById('endAuction');
         this.resetAuctionBtn = document.getElementById('resetAuction');
-        this.prevPlateBtn = document.getElementById('prevPlate');
-        this.nextPlateBtn = document.getElementById('nextPlate');
         
         this.statusDisplay = document.getElementById('auctionStatus');
-        this.plateNumberDisplay = document.getElementById('plateNumber');
-        
-        this.currentPlate = 1;
-        
-        // Pass auctionControls reference to timer for auto-end functionality
-        if (this.timer) {
-            this.timer.auctionControls = this;
-        }
         
         this.bindEvents();
     }
@@ -285,60 +240,59 @@ class AuctionControls {
         this.resumeAuctionBtn.addEventListener('click', () => this.resumeAuction());
         this.endAuctionBtn.addEventListener('click', () => this.endAuction());
         this.resetAuctionBtn.addEventListener('click', () => this.resetAuction());
-        this.prevPlateBtn.addEventListener('click', () => this.previousPlate());
-        this.nextPlateBtn.addEventListener('click', () => this.nextPlate());
     }
     
     startAuction() {
         this.status = 'active';
         this.updateStatus();
         this.updateButtons();
-        this.timer.start();
     }
     
     pauseAuction() {
         this.status = 'paused';
         this.updateStatus();
         this.updateButtons();
-        this.timer.pause();
     }
     
     resumeAuction() {
         this.status = 'active';
         this.updateStatus();
         this.updateButtons();
-        this.timer.resume();
     }
     
     endAuction() {
         this.status = 'ended';
         this.updateStatus();
         this.updateButtons();
-        this.timer.reset();
     }
     
     resetAuction() {
         this.status = 'idle';
         this.updateStatus();
         this.updateButtons();
-        this.timer.reset();
-    }
-    
-    previousPlate() {
-        if (this.currentPlate > 1) {
-            this.currentPlate--;
-            this.plateNumberDisplay.textContent = this.currentPlate;
-        }
-    }
-    
-    nextPlate() {
-        this.currentPlate++;
-        this.plateNumberDisplay.textContent = this.currentPlate;
     }
     
     updateStatus() {
-        this.statusDisplay.textContent = this.status.charAt(0).toUpperCase() + this.status.slice(1);
-        this.statusDisplay.className = 'status-value status-' + this.status;
+        this.statusDisplay.className = 'status-value';
+        
+        switch (this.status) {
+            case 'idle':
+                this.statusDisplay.textContent = 'خامل';
+                this.statusDisplay.classList.add('status-idle');
+                break;
+            case 'active':
+                this.statusDisplay.textContent = 'نشط';
+                this.statusDisplay.classList.add('status-active');
+                break;
+            case 'paused':
+                this.statusDisplay.textContent = 'متوقف';
+                this.statusDisplay.classList.add('status-paused');
+                break;
+            case 'ended':
+                this.statusDisplay.textContent = 'منتهي';
+                this.statusDisplay.classList.add('status-ended');
+                break;
+        }
     }
     
     updateButtons() {
@@ -416,14 +370,8 @@ class BidManager {
     }
 }
 
-// Initialize application when DOM is loaded
+// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    const timer = new AuctionTimer();
-    const plateOverlay = new PlateOverlay();
-    const auctionControls = new AuctionControls(timer);
-    const bidManager = new BidManager();
-    
-    // Initial display update
-    plateOverlay.updateOverlay();
-    bidManager.updateDisplay();
+    const plateManager = new PlateManager();
+    const auctionControls = new AuctionControls();
 });
