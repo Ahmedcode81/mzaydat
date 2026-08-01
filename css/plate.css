@@ -1,0 +1,216 @@
+/* =============================================
+   Saudi License Plate Component
+   SVG Design Layer (assets/plate.svg)
+   ============================================= */
+
+.saudi-plate {
+  position: relative;
+  display: inline-block;
+  direction: ltr;
+  width: 320px;
+  aspect-ratio: 154.7 / 53;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1);
+  font-family: 'Inter', sans-serif;
+  background: url('../assets/plate.svg') no-repeat center / 100% 100%;
+  transition: all 0.3s ease;
+}
+
+/* Plate Sizes */
+.saudi-plate.sm { transform: scale(0.5); transform-origin: top left; }
+.saudi-plate.md { transform: scale(0.75); transform-origin: top left; }
+.saudi-plate.lg { transform: scale(1); }
+
+/* ------------------------------------------------------------------
+   Left Blue Zone (Letters) — 0 → 61.3 / 154.7 ≈ 39.6% width
+   Transparent overlay so the SVG blue section shows through.
+------------------------------------------------------------------- */
+.plate-blue {
+  position: absolute;
+  top: 0;
+  left: 1.5%;
+  width: 38.1%;
+  height: 100%;
+  background: transparent;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 6px;
+  z-index: 2;
+}
+
+.plate-blue .plate-letters-arabic {
+  margin-bottom: auto;
+  font-size: 22px;
+  font-weight: 700;
+  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+  direction: rtl;
+  line-height: 1.1;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.plate-blue .plate-letters-english {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.plate-blue .plate-ksa {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 0.9;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+/* ------------------------------------------------------------------
+   Right White Zone (Numbers) — 61.3 → 154.7 ≈ 60.4% width
+   Transparent overlay; numbers sit in the upper portion so the
+   "المملكة العربية السعودية" text at the bottom-right stays visible.
+------------------------------------------------------------------- */
+.plate-white {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 60.4%;
+  height: 100%;
+  background: transparent;
+  color: #1a1a1a;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-start;
+  padding: 12px 18px 0 0;
+  z-index: 2;
+}
+
+.plate-white .plate-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.plate-white .plate-numbers-arabic {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+  direction: rtl;
+}
+
+.plate-white .plate-type {
+  font-size: 8px;
+  font-weight: 600;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+/* ------------------------------------------------------------------
+   Logo strip — hidden in the SVG design (branding lives in the header).
+------------------------------------------------------------------- */
+.plate-logo {
+  display: none;
+}
+
+/* ------------------------------------------------------------------
+   Plate Variations
+------------------------------------------------------------------- */
+.saudi-plate.standard .plate-white { min-width: 0; }
+.saudi-plate.standard .plate-blue { min-width: 0; }
+
+/* Plate Glow Effect */
+.saudi-plate.live-glow {
+  animation: plateGlow 2s ease-in-out infinite;
+}
+
+@keyframes plateGlow {
+  0%, 100% { box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 4px 40px rgba(212, 168, 67, 0.4), 0 0 20px rgba(212, 168, 67, 0.2), 0 0 0 2px var(--gold-primary); }
+}
+
+/* ------------------------------------------------------------------
+   Large Display Plate
+------------------------------------------------------------------- */
+.saudi-plate.display {
+  width: 420px;
+  border-radius: 16px;
+}
+
+.saudi-plate.display .plate-blue {
+  padding: 14px 8px;
+}
+
+.saudi-plate.display .plate-blue .plate-letters-arabic {
+  font-size: 34px;
+}
+
+.saudi-plate.display .plate-blue .plate-letters-english {
+  font-size: 20px;
+  letter-spacing: 3px;
+}
+
+.saudi-plate.display .plate-blue .plate-ksa {
+  font-size: 11px;
+}
+
+.saudi-plate.display .plate-white {
+  padding: 20px 24px 0 0;
+}
+
+.saudi-plate.display .plate-white .plate-numbers {
+  font-size: 40px;
+  gap: 6px;
+}
+
+.saudi-plate.display .plate-white .plate-numbers-arabic {
+  font-size: 24px;
+}
+
+.saudi-plate.display .plate-white .plate-type {
+  font-size: 11px;
+}
+
+/* RTL Support — the physical plate zones never flip (blue left,
+   white right), so we keep direction ltr on the plate itself. */
+[dir="rtl"] .saudi-plate {
+  direction: ltr;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .saudi-plate.display {
+    width: 300px;
+  }
+
+  .saudi-plate.display .plate-white {
+    padding: 10px 14px;
+  }
+
+  .saudi-plate.display .plate-white .plate-numbers {
+    font-size: 28px;
+  }
+
+  .saudi-plate.display .plate-white .plate-numbers-arabic {
+    font-size: 18px;
+  }
+
+  .saudi-plate.display .plate-blue .plate-letters-arabic {
+    font-size: 24px;
+  }
+
+  .saudi-plate.display .plate-blue .plate-letters-english {
+    font-size: 15px;
+  }
+}
+
