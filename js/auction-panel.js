@@ -8,6 +8,16 @@ class PlateManager {
         this.autoNumberConversionEnabled = false;
         this.reverseConversionEnabled = false;
         
+        // Logo name mapping
+        this.logoNames = {
+            'none': '',
+            'al-diriyah': 'الدرعية',
+            'vision': 'رؤية 2030',
+            'alula': 'العلا',
+            'black-palm': 'النخلة السوداء',
+            'green-palm': 'النخلة الخضراء'
+        };
+        
         // English to Arabic number mapping
         this.englishToArabicNumberMap = {
             '0': '٠',
@@ -77,7 +87,8 @@ class PlateManager {
                 englishLetters: 'A B J',
                 arabicNumbers: '۱۱۱۱',
                 englishNumbers: '-1111',
-                plateType: 'private'
+                plateType: 'private',
+                logoType: 'none'
             };
         }
         
@@ -87,6 +98,7 @@ class PlateManager {
         this.englishNumbersInput = document.getElementById('englishNumbers');
         this.selectedPlateLabel = document.getElementById('selectedPlateLabel');
         this.plateTypeSelect = document.getElementById('plateType');
+        this.logoTypeSelect = document.getElementById('logoType');
         this.autoNumberConversionToggle = document.getElementById('autoNumberConversionToggle');
         this.reverseConversionToggle = document.getElementById('reverseConversionToggle');
         
@@ -104,6 +116,9 @@ class PlateManager {
         
         // Plate type change listener
         this.plateTypeSelect.addEventListener('change', () => this.handlePlateTypeChange());
+        
+        // Logo type change listener
+        this.logoTypeSelect.addEventListener('change', () => this.handleLogoTypeChange());
         
         // Auto conversion toggle listeners
         this.autoNumberConversionToggle.addEventListener('change', () => {
@@ -152,6 +167,11 @@ class PlateManager {
         this.plateData[this.selectedPlate].plateType = this.plateTypeSelect.value;
         this.updateAllOverlays();
         this.updatePlateTypeLabels();
+    }
+    
+    handleLogoTypeChange() {
+        this.plateData[this.selectedPlate].logoType = this.logoTypeSelect.value;
+        this.updateAllOverlays();
     }
     
     updatePlateTypeLabels() {
@@ -250,6 +270,7 @@ class PlateManager {
         this.arabicNumbersInput.value = data.arabicNumbers;
         this.englishNumbersInput.value = data.englishNumbers;
         this.plateTypeSelect.value = data.plateType || 'private';
+        this.logoTypeSelect.value = data.logoType || 'none';
         
         this.selectedPlateLabel.textContent = `اللوحة النشطة: ${this.selectedPlate}`;
     }
@@ -260,7 +281,8 @@ class PlateManager {
             englishLetters: this.englishLettersInput.value,
             arabicNumbers: this.arabicNumbersInput.value,
             englishNumbers: this.englishNumbersInput.value,
-            plateType: this.plateTypeSelect.value
+            plateType: this.plateTypeSelect.value,
+            logoType: this.logoTypeSelect.value
         };
         
         // Update all plate overlays
@@ -273,7 +295,8 @@ class PlateManager {
             englishLetters: this.englishLettersInput.value,
             arabicNumbers: this.arabicNumbersInput.value,
             englishNumbers: this.englishNumbersInput.value,
-            plateType: this.plateTypeSelect.value
+            plateType: this.plateTypeSelect.value,
+            logoType: this.logoTypeSelect.value
         };
     }
     
@@ -286,6 +309,7 @@ class PlateManager {
             const arabicNumbersOverlay = document.getElementById(`overlayArabicNumbers${i}`);
             const englishNumbersOverlay = document.getElementById(`overlayEnglishNumbers${i}`);
             const plateImage = document.querySelector(`.plate-item[data-plate="${i}"] image`);
+            const plateLogoLabel = document.getElementById(`plateLogoLabel${i}`);
             
             if (arabicLettersOverlay) {
                 arabicLettersOverlay.textContent = data.arabicLetters || 'أ ب ج';
@@ -318,6 +342,20 @@ class PlateManager {
                 }
                 
                 plateImage.setAttribute('href', templatePath);
+            }
+            
+            // Update plate logo label based on selection
+            if (plateLogoLabel) {
+                const logoType = data.logoType || 'none';
+                const logoName = this.logoNames[logoType] || '';
+                
+                if (logoName) {
+                    plateLogoLabel.textContent = logoName;
+                    plateLogoLabel.style.display = 'block';
+                } else {
+                    plateLogoLabel.textContent = '';
+                    plateLogoLabel.style.display = 'none';
+                }
             }
         }
     }
