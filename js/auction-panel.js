@@ -5,40 +5,10 @@ class PlateManager {
     constructor() {
         this.selectedPlate = 1;
         this.plateData = {};
-        this.autoConversionEnabled = false;
         this.autoNumberConversionEnabled = false;
+        this.reverseConversionEnabled = false;
         
-        // English to Arabic letter mapping for Saudi license plates
-        this.englishToArabicMap = {
-            'A': 'ش',
-            'B': 'لا',
-            'C': 'چ',
-            'D': 'د',
-            'E': 'د',
-            'F': 'ف',
-            'G': 'غ',
-            'H': 'ه',
-            'I': 'ي',
-            'J': 'ت',
-            'K': 'ن',
-            'L': 'م',
-            'M': 'ة',
-            'N': 'ى',
-            'O': 'خ',
-            'P': 'ح',
-            'Q': 'ق',
-            'R': 'ق',
-            'S': 'س',
-            'T': 'ف',
-            'U': 'ع',
-            'V': 'ر',
-            'W': 'ص',
-            'X': 'ء',
-            'Y': 'غ',
-            'Z': 'ز'
-        };
-        
-        // English to Arabic number mapping for Saudi license plates
+        // English to Arabic number mapping
         this.englishToArabicNumberMap = {
             '0': '٠',
             '1': '١',
@@ -52,13 +22,62 @@ class PlateManager {
             '9': '٩'
         };
         
+        // Arabic to English letter mapping for Saudi license plates
+        this.arabicToEnglishMap = {
+            'ش': 'A',
+            'لا': 'B',
+            'چ': 'C',
+            'د': 'D',
+            'ذ': 'E',
+            'ج': 'G',
+            'ح': 'J',
+            'ي': 'I',
+            'ت': 'J',
+            'ك': 'K',
+            'ل': 'L',
+            'ز': 'M',
+            'م': 'M',
+            'ن': 'N',
+            'ه': 'H',
+            'و': 'U',
+            'ى': 'V',
+            'ر': 'R',
+            'ع': 'E',
+            'ف': 'F',
+            'ص': 'X',
+            'ق': 'G',
+            'ث': 'T',
+            'خ': 'X',
+            'ض': 'D',
+            'ظ': 'Z',
+            'غ': 'Y',
+            'ط': 'T',
+            'ة': 'M',
+            'ء': 'X'
+        };
+        
+        // Arabic-Indic to English number mapping (reverse conversion)
+        this.arabicToEnglishNumberMap = {
+            '٠': '0',
+            '١': '1',
+            '٢': '2',
+            '٣': '3',
+            '٤': '4',
+            '٥': '5',
+            '٦': '6',
+            '٧': '7',
+            '٨': '8',
+            '٩': '9'
+        };
+        
         // Initialize plate data
         for (let i = 1; i <= 5; i++) {
             this.plateData[i] = {
                 arabicLetters: 'أ ب ج',
                 englishLetters: 'A B J',
                 arabicNumbers: '۱۱۱۱',
-                englishNumbers: '-1111'
+                englishNumbers: '-1111',
+                plateType: 'private'
             };
         }
         
@@ -67,11 +86,13 @@ class PlateManager {
         this.arabicNumbersInput = document.getElementById('arabicNumbers');
         this.englishNumbersInput = document.getElementById('englishNumbers');
         this.selectedPlateLabel = document.getElementById('selectedPlateLabel');
-        this.autoConversionToggle = document.getElementById('autoConversionToggle');
+        this.plateTypeSelect = document.getElementById('plateType');
         this.autoNumberConversionToggle = document.getElementById('autoNumberConversionToggle');
+        this.reverseConversionToggle = document.getElementById('reverseConversionToggle');
         
         this.bindEvents();
         this.updateForm();
+        this.updatePlateTypeLabels();
     }
     
     bindEvents() {
@@ -81,13 +102,16 @@ class PlateManager {
         this.arabicNumbersInput.addEventListener('input', () => this.handleArabicNumbersInput());
         this.englishNumbersInput.addEventListener('input', () => this.handleEnglishNumbersInput());
         
-        // Auto conversion toggle listeners
-        this.autoConversionToggle.addEventListener('change', () => {
-            this.autoConversionEnabled = this.autoConversionToggle.checked;
-        });
+        // Plate type change listener
+        this.plateTypeSelect.addEventListener('change', () => this.handlePlateTypeChange());
         
+        // Auto conversion toggle listeners
         this.autoNumberConversionToggle.addEventListener('change', () => {
             this.autoNumberConversionEnabled = this.autoNumberConversionToggle.checked;
+        });
+        
+        this.reverseConversionToggle.addEventListener('change', () => {
+            this.reverseConversionEnabled = this.reverseConversionToggle.checked;
         });
         
         // Plate click listeners
@@ -100,20 +124,20 @@ class PlateManager {
     }
     
     handleArabicLettersInput() {
-        if (this.autoConversionEnabled) {
-            this.convertEnglishToArabic();
+        if (this.reverseConversionEnabled) {
+            this.convertArabicToEnglish();
         }
         this.updatePlateData();
     }
     
     handleEnglishLettersInput() {
-        if (this.autoConversionEnabled) {
-            this.convertEnglishToArabic();
-        }
         this.updatePlateData();
     }
     
     handleArabicNumbersInput() {
+        if (this.reverseConversionEnabled) {
+            this.convertArabicToEnglishNumbers();
+        }
         this.updatePlateData();
     }
     
@@ -124,20 +148,26 @@ class PlateManager {
         this.updatePlateData();
     }
     
-    convertEnglishToArabic() {
-        const englishText = this.englishLettersInput.value.toUpperCase();
-        let arabicText = '';
+    handlePlateTypeChange() {
+        this.plateData[this.selectedPlate].plateType = this.plateTypeSelect.value;
+        this.updateAllOverlays();
+        this.updatePlateTypeLabels();
+    }
+    
+    updatePlateTypeLabels() {
+        const typeNames = {
+            'private': 'خصوصي',
+            'transport': 'نقل',
+            'public-transport': 'نقل عام'
+        };
         
-        for (let char of englishText) {
-            if (this.englishToArabicMap[char]) {
-                arabicText += this.englishToArabicMap[char];
-            } else if (char === ' ') {
-                arabicText += ' ';
+        for (let i = 1; i <= 5; i++) {
+            const plateType = this.plateData[i].plateType || 'private';
+            const label = document.getElementById(`plateTypeLabel${i}`);
+            if (label) {
+                label.textContent = typeNames[plateType] || 'خصوصي';
             }
-            // Ignore characters that don't have mappings
         }
-        
-        this.arabicLettersInput.value = arabicText;
     }
     
     convertEnglishToArabicNumbers() {
@@ -154,6 +184,38 @@ class PlateManager {
         }
         
         this.arabicNumbersInput.value = arabicText;
+    }
+    
+    convertArabicToEnglish() {
+        const arabicText = this.arabicLettersInput.value;
+        let englishText = '';
+        
+        for (let char of arabicText) {
+            if (this.arabicToEnglishMap[char]) {
+                englishText += this.arabicToEnglishMap[char];
+            } else if (char === ' ') {
+                englishText += ' ';
+            }
+            // Ignore characters that don't have mappings
+        }
+        
+        this.englishLettersInput.value = englishText;
+    }
+    
+    convertArabicToEnglishNumbers() {
+        const arabicText = this.arabicNumbersInput.value;
+        let englishText = '';
+        
+        for (let char of arabicText) {
+            if (this.arabicToEnglishNumberMap[char]) {
+                englishText += this.arabicToEnglishNumberMap[char];
+            } else {
+                // Keep non-number characters (like hyphens) as-is
+                englishText += char;
+            }
+        }
+        
+        this.englishNumbersInput.value = englishText;
     }
     
     selectPlate(plateNumber) {
@@ -187,6 +249,7 @@ class PlateManager {
         this.englishLettersInput.value = data.englishLetters;
         this.arabicNumbersInput.value = data.arabicNumbers;
         this.englishNumbersInput.value = data.englishNumbers;
+        this.plateTypeSelect.value = data.plateType || 'private';
         
         this.selectedPlateLabel.textContent = `اللوحة النشطة: ${this.selectedPlate}`;
     }
@@ -196,7 +259,8 @@ class PlateManager {
             arabicLetters: this.arabicLettersInput.value,
             englishLetters: this.englishLettersInput.value,
             arabicNumbers: this.arabicNumbersInput.value,
-            englishNumbers: this.englishNumbersInput.value
+            englishNumbers: this.englishNumbersInput.value,
+            plateType: this.plateTypeSelect.value
         };
         
         // Update all plate overlays
@@ -208,7 +272,8 @@ class PlateManager {
             arabicLetters: this.arabicLettersInput.value,
             englishLetters: this.englishLettersInput.value,
             arabicNumbers: this.arabicNumbersInput.value,
-            englishNumbers: this.englishNumbersInput.value
+            englishNumbers: this.englishNumbersInput.value,
+            plateType: this.plateTypeSelect.value
         };
     }
     
@@ -220,6 +285,7 @@ class PlateManager {
             const englishLettersOverlay = document.getElementById(`overlayEnglishLetters${i}`);
             const arabicNumbersOverlay = document.getElementById(`overlayArabicNumbers${i}`);
             const englishNumbersOverlay = document.getElementById(`overlayEnglishNumbers${i}`);
+            const plateImage = document.querySelector(`.plate-item[data-plate="${i}"] image`);
             
             if (arabicLettersOverlay) {
                 arabicLettersOverlay.textContent = data.arabicLetters || 'أ ب ج';
@@ -232,6 +298,26 @@ class PlateManager {
             }
             if (englishNumbersOverlay) {
                 englishNumbersOverlay.textContent = data.englishNumbers || '-1111';
+            }
+            
+            // Update plate template based on type
+            if (plateImage) {
+                const plateType = data.plateType || 'private';
+                let templatePath = 'plate form/plate-template.svg';
+                
+                switch (plateType) {
+                    case 'private':
+                        templatePath = 'plate form/plate-template.svg';
+                        break;
+                    case 'transport':
+                        templatePath = 'plate form/plate-template-transport.svg';
+                        break;
+                    case 'public-transport':
+                        templatePath = 'plate form/plate-template-public-transport.svg';
+                        break;
+                }
+                
+                plateImage.setAttribute('href', templatePath);
             }
         }
     }
@@ -420,7 +506,8 @@ class BidManager {
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     const plateManager = new PlateManager();
-    const auctionControls = new AuctionControls();
+    const auctionControls = new AuctionControls(plateManager);
+    const bidManager = new BidManager();
     
     // Initial overlay update
     plateManager.updateAllOverlays();

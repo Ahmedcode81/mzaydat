@@ -46,6 +46,122 @@ body {
     overflow-x: hidden;
 }
 
+/* Snapchat Icon */
+.snapchat-icon {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.snapchat-icon a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background-color: #FFFC00;
+    border-radius: 50%;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.snapchat-icon a:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.snapchat-icon i {
+    font-size: 28px;
+    color: #000000;
+}
+
+.snapchat-name {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    white-space: nowrap;
+}
+
+.snapchat-username {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    text-align: center;
+    white-space: nowrap;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.snapchat-phone {
+    margin-top: 4px;
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-secondary);
+    text-align: center;
+    white-space: nowrap;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+@media (max-width: 768px) {
+    .snapchat-icon {
+        top: 15px;
+        left: 15px;
+    }
+    
+    .snapchat-icon a {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .snapchat-icon i {
+        font-size: 22px;
+    }
+    
+    .snapchat-name {
+        font-size: 0.75rem;
+        margin-top: 6px;
+    }
+    
+    .snapchat-phone {
+        font-size: 0.7rem;
+        margin-top: 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .snapchat-icon {
+        top: 10px;
+        left: 10px;
+    }
+    
+    .snapchat-icon a {
+        width: 35px;
+        height: 35px;
+    }
+    
+    .snapchat-icon i {
+        font-size: 18px;
+    }
+    
+    .snapchat-name {
+        font-size: 0.7rem;
+        margin-top: 5px;
+    }
+    
+    .snapchat-phone {
+        font-size: 0.65rem;
+        margin-top: 3px;
+    }
+}
+
 /* Plates Header */
 .plates-header {
     width: 100%;
@@ -165,6 +281,27 @@ body {
     background-color: var(--bg-primary);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-sm);
+}
+
+.plate-item {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.plate-type-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-align: center;
+    margin-bottom: 8px;
+    padding: 4px 12px;
+    background-color: var(--bg-primary);
+    border-radius: 6px;
+    border: 1px solid var(--border-light);
 }
 
 .toggle-switch {
@@ -1091,6 +1228,7 @@ font-size: 1rem;
         padding: 12px;
     }
 }
+
 
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
