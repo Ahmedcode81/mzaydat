@@ -6,6 +6,7 @@ class PlateManager {
         this.selectedPlate = 1;
         this.plateData = {};
         this.autoConversionEnabled = false;
+        this.autoNumberConversionEnabled = false;
         
         // English to Arabic letter mapping for Saudi license plates
         this.englishToArabicMap = {
@@ -37,6 +38,20 @@ class PlateManager {
             'Z': 'ز'
         };
         
+        // English to Arabic number mapping for Saudi license plates
+        this.englishToArabicNumberMap = {
+            '0': '٠',
+            '1': '١',
+            '2': '٢',
+            '3': '٣',
+            '4': '٤',
+            '5': '٥',
+            '6': '٦',
+            '7': '٧',
+            '8': '٨',
+            '9': '٩'
+        };
+        
         // Initialize plate data
         for (let i = 1; i <= 5; i++) {
             this.plateData[i] = {
@@ -53,6 +68,7 @@ class PlateManager {
         this.englishNumbersInput = document.getElementById('englishNumbers');
         this.selectedPlateLabel = document.getElementById('selectedPlateLabel');
         this.autoConversionToggle = document.getElementById('autoConversionToggle');
+        this.autoNumberConversionToggle = document.getElementById('autoNumberConversionToggle');
         
         this.bindEvents();
         this.updateForm();
@@ -62,12 +78,16 @@ class PlateManager {
         // Form input listeners
         this.arabicLettersInput.addEventListener('input', () => this.handleArabicLettersInput());
         this.englishLettersInput.addEventListener('input', () => this.handleEnglishLettersInput());
-        this.arabicNumbersInput.addEventListener('input', () => this.updatePlateData());
-        this.englishNumbersInput.addEventListener('input', () => this.updatePlateData());
+        this.arabicNumbersInput.addEventListener('input', () => this.handleArabicNumbersInput());
+        this.englishNumbersInput.addEventListener('input', () => this.handleEnglishNumbersInput());
         
-        // Auto conversion toggle listener
+        // Auto conversion toggle listeners
         this.autoConversionToggle.addEventListener('change', () => {
             this.autoConversionEnabled = this.autoConversionToggle.checked;
+        });
+        
+        this.autoNumberConversionToggle.addEventListener('change', () => {
+            this.autoNumberConversionEnabled = this.autoNumberConversionToggle.checked;
         });
         
         // Plate click listeners
@@ -93,6 +113,17 @@ class PlateManager {
         this.updatePlateData();
     }
     
+    handleArabicNumbersInput() {
+        this.updatePlateData();
+    }
+    
+    handleEnglishNumbersInput() {
+        if (this.autoNumberConversionEnabled) {
+            this.convertEnglishToArabicNumbers();
+        }
+        this.updatePlateData();
+    }
+    
     convertEnglishToArabic() {
         const englishText = this.englishLettersInput.value.toUpperCase();
         let arabicText = '';
@@ -107,6 +138,22 @@ class PlateManager {
         }
         
         this.arabicLettersInput.value = arabicText;
+    }
+    
+    convertEnglishToArabicNumbers() {
+        const englishText = this.englishNumbersInput.value;
+        let arabicText = '';
+        
+        for (let char of englishText) {
+            if (this.englishToArabicNumberMap[char]) {
+                arabicText += this.englishToArabicNumberMap[char];
+            } else {
+                // Keep non-number characters (like hyphens) as-is
+                arabicText += char;
+            }
+        }
+        
+        this.arabicNumbersInput.value = arabicText;
     }
     
     selectPlate(plateNumber) {
@@ -374,4 +421,7 @@ class BidManager {
 document.addEventListener('DOMContentLoaded', () => {
     const plateManager = new PlateManager();
     const auctionControls = new AuctionControls();
+    
+    // Initial overlay update
+    plateManager.updateAllOverlays();
 });
