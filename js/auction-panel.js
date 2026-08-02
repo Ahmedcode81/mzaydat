@@ -49,29 +49,46 @@ class PlateManager {
             'م': 'Z',
             'ن': 'N',
             'هـ': 'H',
+            'ه': 'h',
             'و': 'U',
-            'ي': 'V'
+            'ي': 'V',
+            'ى': 'v'
         };
         
         // English to Arabic letter mapping for Saudi license plates (reverse mapping)
         this.englishToArabicMap = {
             'A': 'ا',
+            'a': 'ا',
             'B': 'ب',
+            'b': 'ب',
             'J': 'ح',
+            'j': 'ح',
             'D': 'د',
+            'd': 'د',
             'R': 'ر',
+            'r': 'ر',
             'S': 'س',
+            's': 'س',
             'X': 'ص',
+            'x': 'ص',
             'T': 'ط',
+            't': 'ط',
             'E': 'ع',
+            'e': 'ع',
             'G': 'ق',
+            'g': 'ق',
             'K': 'ك',
+            'k': 'ك',
             'L': 'ل',
+            'l': 'ل',
             'Z': 'م',
-            'N': 'ن',
-            'H': 'هـ',
+            'z': 'م',
+            'H': 'ه',
+            'h': 'ه',
             'U': 'و',
-            'V': 'ي'
+            'u': 'و',
+            'V': 'ي',
+            'v': 'ى'
         };
         
         // Flags to prevent infinite conversion loops
@@ -415,6 +432,12 @@ class PlateManager {
                     case 'private':
                         templatePath = 'plate form/plate-template.svg';
                         viewBox = '0 0 154.7 53';
+                        textPositions = {
+                            arabicNumbers: { x: 28, y: 15.5 },
+                            arabicLetters: { x: 119, y: 15.5 },
+                            englishNumbers: { x: 28, y: 37.5 },
+                            englishLetters: { x: 118, y: 37.5 }
+                        };
                         break;
                     case 'transport':
                         templatePath = 'plate form/plate-template-transport.svg';
