@@ -53,6 +53,31 @@ class PlateManager {
             'ي': 'V'
         };
         
+        // English to Arabic letter mapping for Saudi license plates (reverse mapping)
+        this.englishToArabicMap = {
+            'A': 'ا',
+            'B': 'ب',
+            'J': 'ح',
+            'D': 'د',
+            'R': 'ر',
+            'S': 'س',
+            'X': 'ص',
+            'T': 'ط',
+            'E': 'ع',
+            'G': 'ق',
+            'K': 'ك',
+            'L': 'ل',
+            'Z': 'م',
+            'N': 'ن',
+            'H': 'هـ',
+            'U': 'و',
+            'V': 'ي'
+        };
+        
+        // Flags to prevent infinite conversion loops
+        this.isConvertingArabic = false;
+        this.isConvertingEnglish = false;
+        
         // Arabic-Indic to English number mapping (reverse conversion)
         this.arabicToEnglishNumberMap = {
             '٠': '0',
@@ -130,14 +155,21 @@ class PlateManager {
     }
     
     handleArabicLettersInput() {
-        if (this.reverseConversionEnabled) {
+        if (!this.isConvertingArabic) {
+            this.isConvertingArabic = true;
             this.convertArabicToEnglish();
+            this.updatePlateData();
+            this.isConvertingArabic = false;
         }
-        this.updatePlateData();
     }
     
     handleEnglishLettersInput() {
-        this.updatePlateData();
+        if (!this.isConvertingEnglish) {
+            this.isConvertingEnglish = true;
+            this.convertEnglishToArabic();
+            this.updatePlateData();
+            this.isConvertingEnglish = false;
+        }
     }
     
     handleArabicNumbersInput() {
@@ -247,6 +279,22 @@ class PlateManager {
         }
         
         this.englishLettersInput.value = englishText;
+    }
+    
+    convertEnglishToArabic() {
+        const englishText = this.englishLettersInput.value;
+        let arabicText = '';
+        
+        for (let char of englishText) {
+            if (this.englishToArabicMap[char]) {
+                arabicText += this.englishToArabicMap[char];
+            } else if (char === ' ') {
+                arabicText += ' ';
+            }
+            // Ignore characters that don't have mappings
+        }
+        
+        this.arabicLettersInput.value = arabicText;
     }
     
     convertArabicToEnglishNumbers() {
