@@ -193,6 +193,9 @@ class PlateManager {
     }
     
     handleEnglishLettersInput(plateNumber) {
+        // Convert to uppercase automatically
+        this.plateInputs[plateNumber].englishLetters.value = this.plateInputs[plateNumber].englishLetters.value.toUpperCase();
+        
         if (!this.isConvertingEnglish) {
             this.isConvertingEnglish = true;
             this.convertEnglishToArabic(plateNumber);
