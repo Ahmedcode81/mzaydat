@@ -129,7 +129,6 @@ class PlateManager {
         this.plateTypeSelect = document.getElementById('plateType');
         this.logoTypeSelect = document.getElementById('logoType');
         this.autoNumberConversionToggle = document.getElementById('autoNumberConversionToggle');
-        this.reverseConversionToggle = document.getElementById('reverseConversionToggle');
         this.resetAllPlatesBtn = document.getElementById('resetAllPlates');
         
         this.bindEvents();
@@ -156,10 +155,6 @@ class PlateManager {
         // Auto conversion toggle listeners
         this.autoNumberConversionToggle.addEventListener('change', () => {
             this.autoNumberConversionEnabled = this.autoNumberConversionToggle.checked;
-        });
-        
-        this.reverseConversionToggle.addEventListener('change', () => {
-            this.reverseConversionEnabled = this.reverseConversionToggle.checked;
         });
         
         // Plate click listeners
@@ -434,9 +429,9 @@ class PlateManager {
                         viewBox = '0 0 154.7 53';
                         textPositions = {
                             arabicNumbers: { x: 28, y: 15.5 },
-                            arabicLetters: { x: 119, y: 15.5 },
+                            arabicLetters: { x: 135, y: 15.5 },
                             englishNumbers: { x: 28, y: 37.5 },
-                            englishLetters: { x: 118, y: 37.5 }
+                            englishLetters: { x: 135, y: 37.5 }
                         };
                         break;
                     case 'transport':
