@@ -393,7 +393,7 @@ class PlateManager {
                         viewBox = '0 0 198.4 50';
                         textPositions = {
                             arabicNumbers: { x: 30, y: 15 },
-                            arabicLetters: { x: 136, y: 15 },
+                            arabicLetters: { x: 144, y: 15 },
                             englishNumbers: { x: 30, y: 35 },
                             englishLetters: { x: 144, y: 35 }
                         };
