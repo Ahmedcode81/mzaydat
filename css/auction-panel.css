@@ -1263,3 +1263,33 @@ font-size: 1rem;
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-primary);
 }
+
+/* Plates Control Container */
+.plates-control-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Plate Control Panel */
+.plate-control-panel {
+    background-color: var(--bg-secondary);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.plate-control-panel:hover {
+    border-color: var(--accent-secondary);
+    box-shadow: var(--shadow-sm);
+}
+
+.plate-control-panel h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border-light);
+}

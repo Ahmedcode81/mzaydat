@@ -137,36 +137,7 @@
             <aside class="panel left-panel">
                 <section class="card">
                     <h2>معلومات اللوحة النشطة</h2>
-                    <form id="plateForm">
-                        <div class="selected-plate-indicator">
-                            <span id="selectedPlateLabel">اللوحة النشطة: 1</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="plateType">نوع اللوحة:</label>
-                            <select id="plateType">
-                                <option value="private">خصوصي</option>
-                                <option value="transport">نقل</option>
-                                <option value="large-private">خصوصي كبير</option>
-                                <option value="vision">الرؤية</option>
-                                <option value="golden-swords">سيفين ذهبي</option>
-                                <option value="tuwaiq">جبل طويق</option>
-                                <option value="alula">العلا</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="logoType">شعار اللوحة:</label>
-                            <select id="logoType">
-                                <option value="none">بدون شعار</option>
-                                <option value="al-diriyah">الدرعية</option>
-                                <option value="vision">رؤية 2030</option>
-                                <option value="alula">العلا</option>
-                                <option value="black-palm">النخلة السوداء</option>
-                                <option value="green-palm">النخلة الخضراء</option>
-                            </select>
-                        </div>
-                        
+                    <div class="plates-control-container">
                         <div class="form-group">
                             <button id="resetAllPlates" class="btn btn-danger">حذف جميع بيانات اللوحات</button>
                         </div>
@@ -179,27 +150,246 @@
                             </label>
                         </div>
                         
-                        <div class="form-row">
+                        <!-- Plate 1 Panel -->
+                        <div class="plate-control-panel" data-plate="1">
+                            <h3>اللوحة 1</h3>
                             <div class="form-group">
-                                <label for="arabicLetters">الحروف العربية:</label>
-                                <input type="text" id="arabicLetters" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                <label for="plateType1">نوع اللوحة:</label>
+                                <select id="plateType1" class="plate-type-select">
+                                    <option value="private">خصوصي</option>
+                                    <option value="transport">نقل</option>
+                                    <option value="large-private">خصوصي كبير</option>
+                                    <option value="vision">الرؤية</option>
+                                    <option value="golden-swords">سيفين ذهبي</option>
+                                    <option value="tuwaiq">جبل طويق</option>
+                                    <option value="alula">العلا</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="englishLetters">الحروف الإنجليزية:</label>
-                                <input type="text" id="englishLetters" value="A B J" maxlength="15" placeholder="A B J">
+                                <label for="logoType1">شعار اللوحة:</label>
+                                <select id="logoType1" class="logo-type-select">
+                                    <option value="none">بدون شعار</option>
+                                    <option value="al-diriyah">الدرعية</option>
+                                    <option value="vision">رؤية 2030</option>
+                                    <option value="alula">العلا</option>
+                                    <option value="black-palm">النخلة السوداء</option>
+                                    <option value="green-palm">النخلة الخضراء</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicLetters1">الحروف العربية:</label>
+                                    <input type="text" id="arabicLetters1" class="arabic-letters-input" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishLetters1">الحروف الإنجليزية:</label>
+                                    <input type="text" id="englishLetters1" class="english-letters-input" value="A B J" maxlength="15" placeholder="A B J">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicNumbers1">الأرقام العربية:</label>
+                                    <input type="text" id="arabicNumbers1" class="arabic-numbers-input" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishNumbers1">الأرقام الإنجليزية:</label>
+                                    <input type="text" id="englishNumbers1" class="english-numbers-input" value="-1111" maxlength="10" placeholder="-1111">
+                                </div>
                             </div>
                         </div>
-                        <div class="form-row">
+                        
+                        <!-- Plate 2 Panel -->
+                        <div class="plate-control-panel" data-plate="2">
+                            <h3>اللوحة 2</h3>
                             <div class="form-group">
-                                <label for="arabicNumbers">الأرقام العربية:</label>
-                                <input type="text" id="arabicNumbers" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                <label for="plateType2">نوع اللوحة:</label>
+                                <select id="plateType2" class="plate-type-select">
+                                    <option value="private">خصوصي</option>
+                                    <option value="transport">نقل</option>
+                                    <option value="large-private">خصوصي كبير</option>
+                                    <option value="vision">الرؤية</option>
+                                    <option value="golden-swords">سيفين ذهبي</option>
+                                    <option value="tuwaiq">جبل طويق</option>
+                                    <option value="alula">العلا</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="englishNumbers">الأرقام الإنجليزية:</label>
-                                <input type="text" id="englishNumbers" value="-1111" maxlength="10" placeholder="-1111">
+                                <label for="logoType2">شعار اللوحة:</label>
+                                <select id="logoType2" class="logo-type-select">
+                                    <option value="none">بدون شعار</option>
+                                    <option value="al-diriyah">الدرعية</option>
+                                    <option value="vision">رؤية 2030</option>
+                                    <option value="alula">العلا</option>
+                                    <option value="black-palm">النخلة السوداء</option>
+                                    <option value="green-palm">النخلة الخضراء</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicLetters2">الحروف العربية:</label>
+                                    <input type="text" id="arabicLetters2" class="arabic-letters-input" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishLetters2">الحروف الإنجليزية:</label>
+                                    <input type="text" id="englishLetters2" class="english-letters-input" value="A B J" maxlength="15" placeholder="A B J">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicNumbers2">الأرقام العربية:</label>
+                                    <input type="text" id="arabicNumbers2" class="arabic-numbers-input" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishNumbers2">الأرقام الإنجليزية:</label>
+                                    <input type="text" id="englishNumbers2" class="english-numbers-input" value="-1111" maxlength="10" placeholder="-1111">
+                                </div>
                             </div>
                         </div>
-                    </form>
+                        
+                        <!-- Plate 3 Panel -->
+                        <div class="plate-control-panel" data-plate="3">
+                            <h3>اللوحة 3</h3>
+                            <div class="form-group">
+                                <label for="plateType3">نوع اللوحة:</label>
+                                <select id="plateType3" class="plate-type-select">
+                                    <option value="private">خصوصي</option>
+                                    <option value="transport">نقل</option>
+                                    <option value="large-private">خصوصي كبير</option>
+                                    <option value="vision">الرؤية</option>
+                                    <option value="golden-swords">سيفين ذهبي</option>
+                                    <option value="tuwaiq">جبل طويق</option>
+                                    <option value="alula">العلا</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="logoType3">شعار اللوحة:</label>
+                                <select id="logoType3" class="logo-type-select">
+                                    <option value="none">بدون شعار</option>
+                                    <option value="al-diriyah">الدرعية</option>
+                                    <option value="vision">رؤية 2030</option>
+                                    <option value="alula">العلا</option>
+                                    <option value="black-palm">النخلة السوداء</option>
+                                    <option value="green-palm">النخلة الخضراء</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicLetters3">الحروف العربية:</label>
+                                    <input type="text" id="arabicLetters3" class="arabic-letters-input" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishLetters3">الحروف الإنجليزية:</label>
+                                    <input type="text" id="englishLetters3" class="english-letters-input" value="A B J" maxlength="15" placeholder="A B J">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicNumbers3">الأرقام العربية:</label>
+                                    <input type="text" id="arabicNumbers3" class="arabic-numbers-input" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishNumbers3">الأرقام الإنجليزية:</label>
+                                    <input type="text" id="englishNumbers3" class="english-numbers-input" value="-1111" maxlength="10" placeholder="-1111">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plate 4 Panel -->
+                        <div class="plate-control-panel" data-plate="4">
+                            <h3>اللوحة 4</h3>
+                            <div class="form-group">
+                                <label for="plateType4">نوع اللوحة:</label>
+                                <select id="plateType4" class="plate-type-select">
+                                    <option value="private">خصوصي</option>
+                                    <option value="transport">نقل</option>
+                                    <option value="large-private">خصوصي كبير</option>
+                                    <option value="vision">الرؤية</option>
+                                    <option value="golden-swords">سيفين ذهبي</option>
+                                    <option value="tuwaiq">جبل طويق</option>
+                                    <option value="alula">العلا</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="logoType4">شعار اللوحة:</label>
+                                <select id="logoType4" class="logo-type-select">
+                                    <option value="none">بدون شعار</option>
+                                    <option value="al-diriyah">الدرعية</option>
+                                    <option value="vision">رؤية 2030</option>
+                                    <option value="alula">العلا</option>
+                                    <option value="black-palm">النخلة السوداء</option>
+                                    <option value="green-palm">النخلة الخضراء</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicLetters4">الحروف العربية:</label>
+                                    <input type="text" id="arabicLetters4" class="arabic-letters-input" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishLetters4">الحروف الإنجليزية:</label>
+                                    <input type="text" id="englishLetters4" class="english-letters-input" value="A B J" maxlength="15" placeholder="A B J">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicNumbers4">الأرقام العربية:</label>
+                                    <input type="text" id="arabicNumbers4" class="arabic-numbers-input" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishNumbers4">الأرقام الإنجليزية:</label>
+                                    <input type="text" id="englishNumbers4" class="english-numbers-input" value="-1111" maxlength="10" placeholder="-1111">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Plate 5 Panel -->
+                        <div class="plate-control-panel" data-plate="5">
+                            <h3>اللوحة 5</h3>
+                            <div class="form-group">
+                                <label for="plateType5">نوع اللوحة:</label>
+                                <select id="plateType5" class="plate-type-select">
+                                    <option value="private">خصوصي</option>
+                                    <option value="transport">نقل</option>
+                                    <option value="large-private">خصوصي كبير</option>
+                                    <option value="vision">الرؤية</option>
+                                    <option value="golden-swords">سيفين ذهبي</option>
+                                    <option value="tuwaiq">جبل طويق</option>
+                                    <option value="alula">العلا</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="logoType5">شعار اللوحة:</label>
+                                <select id="logoType5" class="logo-type-select">
+                                    <option value="none">بدون شعار</option>
+                                    <option value="al-diriyah">الدرعية</option>
+                                    <option value="vision">رؤية 2030</option>
+                                    <option value="alula">العلا</option>
+                                    <option value="black-palm">النخلة السوداء</option>
+                                    <option value="green-palm">النخلة الخضراء</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicLetters5">الحروف العربية:</label>
+                                    <input type="text" id="arabicLetters5" class="arabic-letters-input" value="أ ب ج" maxlength="15" placeholder="أ ب ج">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishLetters5">الحروف الإنجليزية:</label>
+                                    <input type="text" id="englishLetters5" class="english-letters-input" value="A B J" maxlength="15" placeholder="A B J">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="arabicNumbers5">الأرقام العربية:</label>
+                                    <input type="text" id="arabicNumbers5" class="arabic-numbers-input" value="۱۱۱۱" maxlength="10" placeholder="۱۱۱۱">
+                                </div>
+                                <div class="form-group">
+                                    <label for="englishNumbers5">الأرقام الإنجليزية:</label>
+                                    <input type="text" id="englishNumbers5" class="english-numbers-input" value="-1111" maxlength="10" placeholder="-1111">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
                 <section class="card">

@@ -121,13 +121,19 @@ class PlateManager {
             };
         }
         
-        this.arabicLettersInput = document.getElementById('arabicLetters');
-        this.englishLettersInput = document.getElementById('englishLetters');
-        this.arabicNumbersInput = document.getElementById('arabicNumbers');
-        this.englishNumbersInput = document.getElementById('englishNumbers');
-        this.selectedPlateLabel = document.getElementById('selectedPlateLabel');
-        this.plateTypeSelect = document.getElementById('plateType');
-        this.logoTypeSelect = document.getElementById('logoType');
+        // Store references to all plate inputs
+        this.plateInputs = {};
+        for (let i = 1; i <= 5; i++) {
+            this.plateInputs[i] = {
+                arabicLetters: document.getElementById(`arabicLetters${i}`),
+                englishLetters: document.getElementById(`englishLetters${i}`),
+                arabicNumbers: document.getElementById(`arabicNumbers${i}`),
+                englishNumbers: document.getElementById(`englishNumbers${i}`),
+                plateType: document.getElementById(`plateType${i}`),
+                logoType: document.getElementById(`logoType${i}`)
+            };
+        }
+        
         this.autoNumberConversionToggle = document.getElementById('autoNumberConversionToggle');
         this.resetAllPlatesBtn = document.getElementById('resetAllPlates');
         
@@ -137,17 +143,28 @@ class PlateManager {
     }
     
     bindEvents() {
-        // Form input listeners
-        this.arabicLettersInput.addEventListener('input', () => this.handleArabicLettersInput());
-        this.englishLettersInput.addEventListener('input', () => this.handleEnglishLettersInput());
-        this.arabicNumbersInput.addEventListener('input', () => this.handleArabicNumbersInput());
-        this.englishNumbersInput.addEventListener('input', () => this.handleEnglishNumbersInput());
-        
-        // Plate type change listener
-        this.plateTypeSelect.addEventListener('change', () => this.handlePlateTypeChange());
-        
-        // Logo type change listener
-        this.logoTypeSelect.addEventListener('change', () => this.handleLogoTypeChange());
+        // Bind events for each plate's inputs
+        for (let i = 1; i <= 5; i++) {
+            const inputs = this.plateInputs[i];
+            
+            // Arabic letters input
+            inputs.arabicLetters.addEventListener('input', () => this.handleArabicLettersInput(i));
+            
+            // English letters input
+            inputs.englishLetters.addEventListener('input', () => this.handleEnglishLettersInput(i));
+            
+            // Arabic numbers input
+            inputs.arabicNumbers.addEventListener('input', () => this.handleArabicNumbersInput(i));
+            
+            // English numbers input
+            inputs.englishNumbers.addEventListener('input', () => this.handleEnglishNumbersInput(i));
+            
+            // Plate type change
+            inputs.plateType.addEventListener('change', () => this.handlePlateTypeChange(i));
+            
+            // Logo type change
+            inputs.logoType.addEventListener('change', () => this.handleLogoTypeChange(i));
+        }
         
         // Reset all plates button listener
         this.resetAllPlatesBtn.addEventListener('click', () => this.resetAllPlateData());
@@ -157,55 +174,52 @@ class PlateManager {
             this.autoNumberConversionEnabled = this.autoNumberConversionToggle.checked;
         });
         
-        // Plate click listeners
+        // Plate click listeners (for visual selection only)
         document.querySelectorAll('.plate-item').forEach(plate => {
             plate.addEventListener('click', (e) => {
                 const plateNumber = parseInt(plate.dataset.plate);
-                this.selectPlate(plateNumber);
+                this.highlightPlate(plateNumber);
             });
         });
     }
     
-    handleArabicLettersInput() {
+    handleArabicLettersInput(plateNumber) {
         if (!this.isConvertingArabic) {
             this.isConvertingArabic = true;
-            this.convertArabicToEnglish();
-            this.updatePlateData();
+            this.convertArabicToEnglish(plateNumber);
+            this.updatePlateData(plateNumber);
             this.isConvertingArabic = false;
         }
     }
     
-    handleEnglishLettersInput() {
+    handleEnglishLettersInput(plateNumber) {
         if (!this.isConvertingEnglish) {
             this.isConvertingEnglish = true;
-            this.convertEnglishToArabic();
-            this.updatePlateData();
+            this.convertEnglishToArabic(plateNumber);
+            this.updatePlateData(plateNumber);
             this.isConvertingEnglish = false;
         }
     }
     
-    handleArabicNumbersInput() {
-        if (this.reverseConversionEnabled) {
-            this.convertArabicToEnglishNumbers();
-        }
-        this.updatePlateData();
+    handleArabicNumbersInput(plateNumber) {
+        this.updatePlateData(plateNumber);
     }
     
-    handleEnglishNumbersInput() {
+    handleEnglishNumbersInput(plateNumber) {
         if (this.autoNumberConversionEnabled) {
-            this.convertEnglishToArabicNumbers();
+            this.convertEnglishToArabicNumbers(plateNumber);
         }
-        this.updatePlateData();
+        this.updatePlateData(plateNumber);
     }
     
-    handlePlateTypeChange() {
-        this.plateData[this.selectedPlate].plateType = this.plateTypeSelect.value;
+    handlePlateTypeChange(plateNumber) {
+        this.plateData[plateNumber].plateType = this.plateInputs[plateNumber].plateType.value;
         this.updateAllOverlays();
         this.updatePlateTypeLabels();
     }
     
-    handleLogoTypeChange() {
-        this.plateData[this.selectedPlate].logoType = this.logoTypeSelect.value;
+    handleLogoTypeChange(plateNumber) {
+        this.plateData[plateNumber].logoType = this.plateInputs[plateNumber].logoType.value;
         this.updateAllOverlays();
     }
     
@@ -277,8 +291,8 @@ class PlateManager {
         this.arabicNumbersInput.value = arabicText;
     }
     
-    convertArabicToEnglish() {
-        const arabicText = this.arabicLettersInput.value;
+    convertArabicToEnglish(plateNumber) {
+        const arabicText = this.plateInputs[plateNumber].arabicLetters.value;
         let englishText = '';
         
         for (let char of arabicText) {
@@ -290,11 +304,11 @@ class PlateManager {
             // Ignore characters that don't have mappings
         }
         
-        this.englishLettersInput.value = englishText;
+        this.plateInputs[plateNumber].englishLetters.value = englishText;
     }
     
-    convertEnglishToArabic() {
-        const englishText = this.englishLettersInput.value;
+    convertEnglishToArabic(plateNumber) {
+        const englishText = this.plateInputs[plateNumber].englishLetters.value;
         let arabicText = '';
         
         for (let char of englishText) {
@@ -306,11 +320,11 @@ class PlateManager {
             // Ignore characters that don't have mappings
         }
         
-        this.arabicLettersInput.value = arabicText;
+        this.plateInputs[plateNumber].arabicLetters.value = arabicText;
     }
     
-    convertArabicToEnglishNumbers() {
-        const arabicText = this.arabicNumbersInput.value;
+    convertArabicToEnglishNumbers(plateNumber) {
+        const arabicText = this.plateInputs[plateNumber].arabicNumbers.value;
         let englishText = '';
         
         for (let char of arabicText) {
@@ -322,54 +336,68 @@ class PlateManager {
             }
         }
         
-        this.englishNumbersInput.value = englishText;
+        this.plateInputs[plateNumber].englishNumbers.value = englishText;
+    }
+    
+    convertEnglishToArabicNumbers(plateNumber) {
+        const englishText = this.plateInputs[plateNumber].englishNumbers.value;
+        let arabicText = '';
+        
+        const englishToArabicNumberMap = {
+            '0': '٠',
+            '1': '١',
+            '2': '٢',
+            '3': '٣',
+            '4': '٤',
+            '5': '٥',
+            '6': '٦',
+            '7': '٧',
+            '8': '٨',
+            '9': '٩'
+        };
+        
+        for (let char of englishText) {
+            if (englishToArabicNumberMap[char]) {
+                arabicText += englishToArabicNumberMap[char];
+            } else {
+                // Keep non-number characters (like hyphens) as-is
+                arabicText += char;
+            }
+        }
+        
+        this.plateInputs[plateNumber].arabicNumbers.value = arabicText;
     }
     
     selectPlate(plateNumber) {
-        // Save current form data before switching
-        this.saveCurrentData();
-        
-        // Update selected plate
-        this.selectedPlate = plateNumber;
-        
-        // Update visual selection
-        document.querySelectorAll('.plate-item').forEach(plate => {
-            plate.classList.remove('selected');
-        });
-        
-        const selectedPlateElement = document.querySelector(`.plate-item[data-plate="${plateNumber}"]`);
-        if (selectedPlateElement) {
-            selectedPlateElement.classList.add('selected');
-        }
-        
-        // Update form with new plate data
-        this.updateForm();
-        
-        // Update main plate display
-        this.updateMainPlateDisplay();
+        // Update visual selection for highlighting only
+        this.highlightPlate(plateNumber);
     }
     
     updateForm() {
-        const data = this.plateData[this.selectedPlate];
-        
-        this.arabicLettersInput.value = data.arabicLetters;
-        this.englishLettersInput.value = data.englishLetters;
-        this.arabicNumbersInput.value = data.arabicNumbers;
-        this.englishNumbersInput.value = data.englishNumbers;
-        this.plateTypeSelect.value = data.plateType || 'private';
-        this.logoTypeSelect.value = data.logoType || 'none';
-        
-        this.selectedPlateLabel.textContent = `اللوحة النشطة: ${this.selectedPlate}`;
+        // Update all plate forms with their respective data
+        for (let i = 1; i <= 5; i++) {
+            const data = this.plateData[i];
+            const inputs = this.plateInputs[i];
+            
+            inputs.arabicLetters.value = data.arabicLetters;
+            inputs.englishLetters.value = data.englishLetters;
+            inputs.arabicNumbers.value = data.arabicNumbers;
+            inputs.englishNumbers.value = data.englishNumbers;
+            inputs.plateType.value = data.plateType || 'private';
+            inputs.logoType.value = data.logoType || 'none';
+        }
     }
     
-    updatePlateData() {
-        this.plateData[this.selectedPlate] = {
-            arabicLetters: this.arabicLettersInput.value,
-            englishLetters: this.englishLettersInput.value,
-            arabicNumbers: this.arabicNumbersInput.value,
-            englishNumbers: this.englishNumbersInput.value,
-            plateType: this.plateTypeSelect.value,
-            logoType: this.logoTypeSelect.value
+    updatePlateData(plateNumber) {
+        const inputs = this.plateInputs[plateNumber];
+        
+        this.plateData[plateNumber] = {
+            arabicLetters: inputs.arabicLetters.value,
+            englishLetters: inputs.englishLetters.value,
+            arabicNumbers: inputs.arabicNumbers.value,
+            englishNumbers: inputs.englishNumbers.value,
+            plateType: inputs.plateType.value,
+            logoType: inputs.logoType.value
         };
         
         // Update all plate overlays
@@ -377,14 +405,22 @@ class PlateManager {
     }
     
     saveCurrentData() {
-        this.plateData[this.selectedPlate] = {
-            arabicLetters: this.arabicLettersInput.value,
-            englishLetters: this.englishLettersInput.value,
-            arabicNumbers: this.arabicNumbersInput.value,
-            englishNumbers: this.englishNumbersInput.value,
-            plateType: this.plateTypeSelect.value,
-            logoType: this.logoTypeSelect.value
-        };
+        // Save all plate data from their respective inputs
+        for (let i = 1; i <= 5; i++) {
+            const inputs = this.plateInputs[i];
+            
+            this.plateData[i] = {
+                arabicLetters: inputs.arabicLetters.value,
+                englishLetters: inputs.englishLetters.value,
+                arabicNumbers: inputs.arabicNumbers.value,
+                englishNumbers: inputs.englishNumbers.value,
+                plateType: inputs.plateType.value,
+                logoType: inputs.logoType.value
+            };
+        }
+        
+        // Update all plate overlays
+        this.updateAllOverlays();
     }
     
     updateAllOverlays() {
@@ -418,9 +454,9 @@ class PlateManager {
                 let viewBox = '0 0 154.7 53';
                 let textPositions = {
                     arabicNumbers: { x: 28, y: 15.5 },
-                    arabicLetters: { x: 115, y: 15.5 },
+                    arabicLetters: { x: 123, y: 15.5 },
                     englishNumbers: { x: 28, y: 37.5 },
-                    englishLetters: { x: 118, y: 37.5 }
+                    englishLetters: { x: 123, y: 37.5 }
                 };
                 
                 switch (plateType) {
@@ -429,9 +465,9 @@ class PlateManager {
                         viewBox = '0 0 154.7 53';
                         textPositions = {
                             arabicNumbers: { x: 28, y: 15.5 },
-                            arabicLetters: { x: 135, y: 15.5 },
+                            arabicLetters: { x: 123, y: 15.5 },
                             englishNumbers: { x: 28, y: 37.5 },
-                            englishLetters: { x: 135, y: 37.5 }
+                            englishLetters: { x: 123, y: 37.5 }
                         };
                         break;
                     case 'transport':
@@ -496,23 +532,15 @@ class PlateManager {
                         break;
                 }
                 
-                // Console logs for debugging
-                console.log('=== Plate Type Switch ===');
-                console.log('Selected Plate Type:', plateType);
-                console.log('Loading SVG Template:', templatePath);
-                console.log('Setting viewBox:', viewBox);
-                console.log('Text Positions:', textPositions);
+                plateImage.setAttribute('href', templatePath);
+                plateImage.setAttribute('width', '100%');
+                plateImage.setAttribute('height', '100%');
                 
-                // Update SVG viewBox
-                const svgElement = plateImage.closest('svg');
-                if (svgElement) {
-                    const oldViewBox = svgElement.getAttribute('viewBox');
-                    console.log('Previous viewBox:', oldViewBox);
-                    svgElement.setAttribute('viewBox', viewBox);
-                    console.log('New viewBox set to:', svgElement.getAttribute('viewBox'));
+                const svgContainer = plateImage.closest('svg');
+                if (svgContainer) {
+                    svgContainer.setAttribute('viewBox', viewBox);
                 }
                 
-                // Update text positions
                 if (arabicNumbersOverlay) {
                     console.log('Arabic Numbers position:', textPositions.arabicNumbers.x, textPositions.arabicNumbers.y);
                     arabicNumbersOverlay.setAttribute('x', textPositions.arabicNumbers.x);
@@ -533,37 +561,15 @@ class PlateManager {
                     englishLettersOverlay.setAttribute('x', textPositions.englishLetters.x);
                     englishLettersOverlay.setAttribute('y', textPositions.englishLetters.y);
                 }
-                
-                // Update template image and remove fixed dimensions
-                const oldHref = plateImage.getAttribute('href');
-                console.log('Previous template:', oldHref);
-                plateImage.setAttribute('href', templatePath);
-                plateImage.setAttribute('width', '100%');
-                plateImage.setAttribute('height', '100%');
-                console.log('New template set to:', templatePath);
-                console.log('Image dimensions set to 100%');
-                console.log('=== End Plate Type Switch ===');
             }
             
-            // Update plate logo label based on selection
             if (plateLogoLabel) {
-                const logoType = data.logoType || 'none';
-                const logoName = this.logoNames[logoType] || '';
-                
-                if (logoName) {
-                    plateLogoLabel.textContent = logoName;
-                    plateLogoLabel.style.display = 'block';
-                } else {
-                    plateLogoLabel.textContent = '';
-                    plateLogoLabel.style.display = 'none';
-                }
+                plateLogoLabel.textContent = data.logoType || '';
             }
         }
-    }
-    
-    updateMainPlateDisplay() {
+        
         // Update main plate (always shows selected plate)
-        const data = this.plateData[this.selectedPlate];
+        const data = this.plateData[1];
         
         const mainArabicLetters = document.getElementById('overlayArabicLetters1');
         const mainEnglishLetters = document.getElementById('overlayEnglishLetters1');
@@ -581,12 +587,6 @@ class PlateManager {
         }
         if (mainEnglishNumbers) {
             mainEnglishNumbers.textContent = data.englishNumbers;
-        }
-        
-        // Update main plate label
-        const mainPlateLabel = document.querySelector('.main-plate .plate-number');
-        if (mainPlateLabel) {
-            mainPlateLabel.textContent = `اللوحة النشطة - ${this.selectedPlate}`;
         }
     }
 }
